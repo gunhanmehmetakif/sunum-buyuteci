@@ -1,0 +1,60 @@
+<Window x:Class="SunumBuyuteci.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sunum Büyüteci" Icon="app.ico" Width="520" SizeToContent="Height"
+        ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen"
+        Background="#F4F6FA" FontFamily="Segoe UI Variable Text, Segoe UI"
+        UseLayoutRounding="True" TextOptions.TextFormattingMode="Ideal">
+    <Window.Resources>
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#1D4ED8"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Background" Value="#C5CCD8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Margin="28,26,28,28">
+        <TextBlock Text="Sunum Büyüteci" FontSize="24" FontWeight="SemiBold" Foreground="#111827"/>
+        <TextBlock x:Name="InstructionText" Text="Sunumun gösterileceği ekranı seçin"
+                   FontSize="15" Foreground="#4B5563" Margin="0,6,0,18"/>
+
+        <StackPanel x:Name="CardsPanel"/>
+
+        <Border x:Name="EmptyPanel" Visibility="Collapsed" Background="White" CornerRadius="12"
+                BorderBrush="#E5E7EB" BorderThickness="1" Padding="20">
+            <StackPanel>
+                <TextBlock Text="Sunum ekranı bulunamadı. Windows ekran modu 'Uzat' olmalı."
+                           FontSize="15" Foreground="#111827" TextWrapping="Wrap"/>
+                <Button Content="Uzat'a geç" Style="{StaticResource PrimaryButton}"
+                        Margin="0,16,0,0" Click="ExtendButton_Click"/>
+            </StackPanel>
+        </Border>
+
+        <Button x:Name="StartButton" Content="Başlat" Style="{StaticResource PrimaryButton}"
+                Margin="0,20,0,0" IsEnabled="False" IsDefault="True" Click="StartButton_Click"/>
+
+        <Button x:Name="ShortcutsLink" Content="Kısayollar" HorizontalAlignment="Center" Margin="0,14,0,0"
+                Cursor="Hand" Foreground="#2563EB" FontSize="13" Background="Transparent"
+                BorderThickness="0" Padding="8,2" Click="ShortcutsLink_Click"/>
+    </StackPanel>
+</Window>

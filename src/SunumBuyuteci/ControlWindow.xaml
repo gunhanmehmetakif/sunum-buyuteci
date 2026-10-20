@@ -1,0 +1,143 @@
+<Window x:Class="SunumBuyuteci.ControlWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sunum Büyüteci" Icon="app.ico" SizeToContent="WidthAndHeight"
+        ResizeMode="CanMinimize" ShowInTaskbar="True" WindowStartupLocation="Manual"
+        Background="#F4F6FA" FontFamily="Segoe UI Variable Text, Segoe UI"
+        UseLayoutRounding="True" TextOptions.TextFormattingMode="Ideal">
+    <Window.Resources>
+        <Style x:Key="IconText" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="ToolButton" TargetType="Button">
+            <Setter Property="Foreground" Value="#111827"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E5E7EB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="MinWidth" Value="40"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#E8EEFB"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#BFD0F7"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#D5E1F9"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Background" Value="#F4F6FA"/>
+                                <Setter Property="Foreground" Value="#B6BDC9"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="LockToggle" TargetType="ToggleButton">
+            <Setter Property="Foreground" Value="#111827"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E5E7EB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="MinWidth" Value="40"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#E8EEFB"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#BFD0F7"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#F97316"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#EA580C"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsChecked" Value="True"/>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Bd" Property="Background" Value="#EA580C"/>
+                            </MultiTrigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Background" Value="#F4F6FA"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#E5E7EB"/>
+                                <Setter Property="Foreground" Value="#B6BDC9"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Orientation="Horizontal" Margin="12">
+        <Button x:Name="ZoomOutButton" Style="{StaticResource ToolButton}" Click="ZoomOut_Click"
+                ToolTip="Uzaklaştır (Ctrl+Alt+↓ / Ctrl+Alt+Tekerlek)">
+            <TextBlock Style="{StaticResource IconText}" Text="&#xE738;"/>
+        </Button>
+        <TextBlock x:Name="ZoomLabel" Text="100%" Width="80" TextAlignment="Center" VerticalAlignment="Center"
+                   FontSize="18" FontWeight="SemiBold" Foreground="#111827"/>
+        <Button x:Name="ZoomInButton" Style="{StaticResource ToolButton}" Click="ZoomIn_Click"
+                ToolTip="Yakınlaştır (Ctrl+Alt+↑ / Ctrl+Alt+Tekerlek)">
+            <TextBlock Style="{StaticResource IconText}" Text="&#xE710;"/>
+        </Button>
+
+        <Border Width="1" Height="28" Background="#D9DEE7" Margin="12,0"/>
+
+        <ToggleButton x:Name="LockButton" Style="{StaticResource LockToggle}" Click="Lock_Click"
+                      ToolTip="Çerçeveyi kilitle (Ctrl+Alt+K)">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="LockGlyph" Style="{StaticResource IconText}" Text="&#xE785;"/>
+                <TextBlock Text="Kilit" Margin="8,0,0,0" VerticalAlignment="Center"/>
+            </StackPanel>
+        </ToggleButton>
+        <Button x:Name="FullButton" Style="{StaticResource ToolButton}" Click="Full_Click" Margin="8,0,0,0"
+                ToolTip="Tam ekran / son büyütme (Ctrl+Alt+0)">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Style="{StaticResource IconText}" Text="&#xE740;"/>
+                <TextBlock Text="Tam ekran" Margin="8,0,0,0" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+
+        <Border Width="1" Height="28" Background="#D9DEE7" Margin="12,0"/>
+
+        <Button x:Name="SettingsButton" Style="{StaticResource ToolButton}" Click="Settings_Click" ToolTip="Ayarlar">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Style="{StaticResource IconText}" Text="&#xE713;"/>
+                <TextBlock Text="Ayarlar" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                <TextBlock Style="{StaticResource IconText}" Text="&#xE70D;" FontSize="10" Margin="8,0,0,0"/>
+            </StackPanel>
+        </Button>
+    </StackPanel>
+</Window>
