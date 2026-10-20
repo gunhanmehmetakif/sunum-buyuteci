@@ -1,0 +1,11 @@
+name: Öneri
+description: Yeni bir özellik veya iyileştirme fikri
+labels: [öneri]
+body:
+  - type: textarea
+    id: oneri
+    attributes:
+      label: Öneriniz
+      description: Neye ihtiyacınız var, hangi durumda işinize yarar?
+    validations:
+      required: true

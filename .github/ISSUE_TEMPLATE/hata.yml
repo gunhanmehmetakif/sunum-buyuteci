@@ -1,0 +1,32 @@
+name: Hata bildirimi
+description: Bir şey beklendiği gibi çalışmıyor
+labels: [hata]
+body:
+  - type: textarea
+    id: ne-oldu
+    attributes:
+      label: Ne oldu?
+      description: Ne yaptınız, ne bekliyordunuz, ne oldu?
+    validations:
+      required: true
+  - type: input
+    id: surum
+    attributes:
+      label: Uygulama sürümü
+      placeholder: v0.1.0
+  - type: input
+    id: windows
+    attributes:
+      label: Windows sürümü
+      placeholder: Windows 11 24H2
+  - type: textarea
+    id: ekranlar
+    attributes:
+      label: Ekranlar
+      description: Kaç ekran, çözünürlükleri, bağlantı (HDMI, kablosuz vb.)
+      placeholder: "Dizüstü 1920x1080 + projeksiyon 1024x768 (HDMI)"
+  - type: textarea
+    id: ek
+    attributes:
+      label: Ekran görüntüsü / video
+      description: Varsa sürükleyip bırakın.

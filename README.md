@@ -1,36 +1,98 @@
+<div align="center">
+
+<img src="docs/images/simge.png" width="96" alt="Sunum Büyüteci simgesi">
+
 # Sunum Büyüteci
 
-Projeksiyon veya TV'ye sunum yaparken ekranın bir bölümünü **yalnız izleyicilere** büyütülmüş gösteren Windows uygulaması.
+**Sunum yaparken ekranın bir bölümünü yalnız izleyicilere büyütün. Sizin ekranınız olduğu gibi kalır.**
+
+[![Son sürüm](https://img.shields.io/github/v/release/gunhanmehmetakif/sunum-buyuteci?include_prereleases&label=s%C3%BCr%C3%BCm)](https://github.com/gunhanmehmetakif/sunum-buyuteci/releases) ![Windows 10/11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4) [![Lisans: MIT](https://img.shields.io/badge/lisans-MIT-green)](LICENSE)
+
+### [⬇ İndir (SunumBuyuteci.exe)](https://github.com/gunhanmehmetakif/sunum-buyuteci/releases/latest)
+
+Kurulum gerekmez · .NET gerekmez · Tek dosya
+
+<br>
+
+<img src="docs/images/nasil-calisir.png" alt="Sizin ekranınız normal boyutta, projeksiyonda seçili alan büyütülmüş" width="100%">
+
+</div>
 
 ## Neden?
 
-Bir derste hoca sunum yaparken Windows Büyüteci'ni kullanıyordu. Büyüteç kendi ekranının üzerinde çalıştığı için sürekli tam ekran / büyüt arasında geçiş yapmak zorunda kalıyor, büyütünce de dışarıda kalan kısmı kendisi göremiyordu. Bu proje o sorundan doğdu:
+Bir derste hoca sunum yaparken Windows Büyüteci'ni kullanıyordu. Büyüteç kendi ekranının üzerinde çalıştığı için sürekli büyüt / tam ekran arasında gidip geliyor, büyütünce de dışarıda kalan kısmı kendisi göremiyordu. Bu proje o sorunu çözmek için yapıldı.
 
-- Siz kendi ekranınızı **normal boyutta** görmeye devam edersiniz.
-- Sunum ekranında (projeksiyon/TV) ise seçtiğiniz bölge **büyütülmüş** görünür.
-- Kendi ekranınızda yalnızca büyütülen alanı gösteren bir çerçeve çıkar; çerçeve izleyicilere görünmez.
+| | Windows Büyüteci | Sunum Büyüteci |
+|---|:---:|:---:|
+| Sizin ekranınız büyütülür mü? | Evet, ekranı kaybedersiniz | **Hayır, normal kalır** |
+| Büyütülen alanın dışını görebilir misiniz? | Hayır | **Evet** |
+| İzleyiciler büyütülmüş hâli görür mü? | Evet | **Evet** |
+| Büyütülen alan sizin ekranınızda belli mi? | — | **Çerçeveyle gösterilir (izleyiciler görmez)** |
 
-## İndirme
+## Özellikler
 
-[Releases](../../releases) sayfasından `SunumBuyuteci.exe` dosyasını indirin. Kurulum gerekmez; .NET yüklü olması da gerekmez.
+- **Canlı büyütme:** Projeksiyon/TV'de, fareyi takip eden büyütülmüş görüntü.
+- **Görünmez çerçeve:** Neresinin büyütüldüğünü yalnız siz görürsünüz.
+- **Kontrol penceresi:** Tek tıkla büyüt, küçült, kilitle, tam ekrana dön. İzleyiciler bu pencereyi de görmez.
+- **Kısayollar:** Klavyeden ve fare tekerleğinden yakınlaştırma. AltGr ile yazılan `@` gibi karakterleri bozmaz.
+- **Çerçeve kilidi:** Büyütülen alanı sabitleyip fareyi serbestçe kullanın.
+- **Kablo dostu:** Projeksiyon kablosu çıkıp takılınca kaldığı yerden devam eder.
 
-> Not: Windows SmartScreen imzasız uygulama uyarısı verebilir: "Ek bilgi → Yine de çalıştır".
+<img src="docs/images/kontrol-penceresi.png" alt="Kontrol penceresi: −, 200%, +, Kilit, Tam ekran, Ayarlar" width="560">
 
 ## Kullanım
 
-1. Projeksiyonu bağlayın, `Win + P` → **Uzat**.
-2. `SunumBuyuteci.exe`'yi açın, sunum ekranını seçip **Başlat**'a basın.
-3. Kontrol penceresinden veya kısayollarla (ör. `Ctrl + Alt + Fare tekerleği`) yakınlaştırın.
+1. Projeksiyonu veya TV'yi bağlayın, `Win + P` → **Uzat**'ı seçin.
+2. `SunumBuyuteci.exe`'yi açın. Ekranlarda büyük numaralar belirir; sunum ekranını seçip **Başlat**'a basın.
+3. Kontrol penceresinden veya kısayollarla yakınlaştırın.
 
-Ayrıntılar ve tüm kısayollar: [docs/KULLANIM.md](docs/KULLANIM.md)
+| Kısayol | İş |
+|---|---|
+| `Ctrl + Alt + Fare tekerleği` | Yakınlaştır / uzaklaştır |
+| `Ctrl + Alt + ↑ / ↓` (veya numpad `+ / -`) | Yakınlaştır / uzaklaştır |
+| `Ctrl + Alt + 0` | Tam ekran (1x) |
+| `Ctrl + Alt + K` | Çerçeveyi kilitle / çöz |
+| `Ctrl + Alt + Q` | Çıkış |
 
-## Derleme
+PowerPoint ile kullanım ve ayrıntılar: **[Kullanım kılavuzu](docs/KULLANIM.md)**
 
-.NET 10 SDK gerekir (Windows, WPF).
+## Sık sorulanlar
+
+<details>
+<summary><b>"Windows bilgisayarınızı korudu" uyarısı çıkıyor.</b></summary>
+
+Uygulama imzasız olduğu için SmartScreen uyarı verir. **Ek bilgi → Yine de çalıştır**'a basın. Kaynak kodun tamamı bu depoda.
+</details>
+
+<details>
+<summary><b>"Sunum ekranı bulunamadı" diyor.</b></summary>
+
+Windows ekran modu **Yinele** ise iki ekrana farklı görüntü verilemez. Uygulamadaki **Uzat'a geç** düğmesine basın veya `Win + P` → **Uzat** seçin.
+</details>
+
+<details>
+<summary><b>Bazı pencereler projeksiyonda siyah görünüyor.</b></summary>
+
+Yönetici izni (UAC) pencereleri ve korumalı videolar (Netflix vb.) Windows tarafından kopyalanamaz.
+</details>
+
+<details>
+<summary><b>Bildirimlerim izleyicilere görünür mü?</b></summary>
+
+Evet, sizin ekranınızda görünen her şey projeksiyona da yansır. Sunumdan önce **Rahatsız etmeyin**'i açın.
+</details>
+
+## Kaynaktan derleme
+
+[.NET 10 SDK](https://dotnet.microsoft.com/download) gerekir.
 
 ```
 dotnet publish src\SunumBuyuteci\SunumBuyuteci.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=none -o dist
 ```
+
+## Katkı ve hata bildirimi
+
+Bir sorun gördüyseniz veya fikriniz varsa [Issues](https://github.com/gunhanmehmetakif/sunum-buyuteci/issues/new/choose) sayfasından yazın.
 
 ## Lisans
 
