@@ -28,18 +28,30 @@ Bir derste hoca sunum yaparken Windows Büyüteci'ni kullanıyordu. Büyüteç k
 | Büyütülen alanın dışını görebilir misiniz? | Hayır | **Evet** |
 | İzleyiciler büyütülmüş hâli görür mü? | Evet | **Evet** |
 | Büyütülen alan sizin ekranınızda belli mi? | — | **Çerçeveyle gösterilir (izleyiciler görmez)** |
+| İzleyicilere imleç yerine el veya lazer gösterilebilir mi? | Hayır | **Evet, ya da imleç tamamen gizlenir** |
 
 ## Özellikler
 
 - **Canlı büyütme:** Projeksiyon/TV'de, fareyi takip eden büyütülmüş görüntü.
 - **Görünmez çerçeve:** Neresinin büyütüldüğünü yalnız siz görürsünüz.
-- **Kontrol penceresi:** Tek tıkla büyüt, küçült, kilitle, tam ekrana dön. İzleyiciler bu pencereyi de görmez.
+- **Kontrol penceresi:** Tek tıkla büyüt, küçült, kilitle, tam ekrana dön, işaretçiyi seç. İzleyiciler bu pencereyi de görmez.
 - **Kısayollar:** Klavyeden ve fare tekerleğinden yakınlaştırma. AltGr ile yazılan `@` gibi karakterleri bozmaz.
-- **İşaretçi görünümü:** İzleyiciler imleç yerine el, lazer, halka gibi bir işaretçi görür ya da hiç görmez. Sizin imleciniz değişmez.
+- **İşaretçi görünümü:** İzleyiciler imleç yerine el, lazer, halka gibi bir işaretçi görür ya da hiç görmez. Sizin imleciniz değişmez. *(yeni)*
 - **Çerçeve kilidi:** Büyütülen alanı sabitleyip fareyi serbestçe kullanın.
 - **Kablo dostu:** Projeksiyon kablosu çıkıp takılınca kaldığı yerden devam eder.
 
-<img src="docs/images/kontrol-penceresi.png" alt="Kontrol penceresi: −, 200%, +, Kilit, Tam ekran, Ayarlar" width="560">
+<img src="docs/images/kontrol-penceresi.png" alt="Kontrol penceresi: −, 200%, +, Kilit, Tam ekran, İşaretçi, Ayarlar" width="700">
+
+## İşaretçi görünümü
+
+Projeksiyonda Windows imleci küçük kalır ve uzaktan zor seçilir. Gerçek lazer kalemler de TV ve LED ekranlarda görünmez. Sunum Büyüteci, izleyicilerin gördüğü imleci sizin seçtiğiniz bir işaretçiyle değiştirir:
+
+<img src="docs/images/isaretciler.png" alt="İşaretçiler: Normal, El, Büyük ok, Lazer, Halka, Nişangah, Gizli" width="100%">
+
+- **Sizin ekranınızda imleç normal kalır.** Tıklarken hassasiyet kaybolmaz; değişen yalnız izleyicilerin gördüğüdür.
+- **Boyut:** Küçük, Orta veya Büyük. İşaretçi yakınlaştırmayla büyüyüp bulanıklaşmaz, hep net kalır.
+- **Seçmek için:** Kontrol penceresindeki **İşaretçi** düğmesi, simge alanındaki menü veya `Ctrl + Alt + L`. Seçiminiz hatırlanır.
+- **Video izletirken:** `Ctrl + Alt + G` ile imleci izleyicilerden gizleyin, aynı kısayolla geri getirin.
 
 ## Kullanım
 
