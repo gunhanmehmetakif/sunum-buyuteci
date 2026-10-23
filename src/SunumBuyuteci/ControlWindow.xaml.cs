@@ -165,7 +165,13 @@ public partial class ControlWindow : Window
     public void SetState(double zoom, bool locked, FollowMode mode, bool clipCursor, bool waiting,
         PointerStyle pointerStyle, PointerSize pointerSize)
     {
-        foreach (var (style, item) in _pointerStyles) item.IsChecked = style == pointerStyle;
+        // Not IsChecked: the check mark would replace the preview icon.
+        foreach (var (style, item) in _pointerStyles)
+        {
+            var selected = style == pointerStyle;
+            item.FontWeight = selected ? FontWeights.SemiBold : FontWeights.Normal;
+            item.InputGestureText = selected ? "✓" : "";
+        }
         foreach (var (size, item) in _pointerSizes) item.IsChecked = size == pointerSize;
         PointerIcon.Source = PointerWindow.RenderPreview(pointerStyle);
         _locked = locked;
