@@ -8,9 +8,9 @@
 
 [![Son sürüm](https://img.shields.io/github/v/release/gunhanmehmetakif/sunum-buyuteci?include_prereleases&label=s%C3%BCr%C3%BCm)](https://github.com/gunhanmehmetakif/sunum-buyuteci/releases) ![Windows 10/11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4) [![Lisans: MIT](https://img.shields.io/badge/lisans-MIT-green)](LICENSE)
 
-### [⬇ İndir (SunumBuyuteci.exe)](https://github.com/gunhanmehmetakif/sunum-buyuteci/releases/latest)
+### [⬇ İndir (SunumBuyuteci.exe)](https://github.com/gunhanmehmetakif/sunum-buyuteci/releases/latest/download/SunumBuyuteci.exe)
 
-Kurulum gerekmez · .NET gerekmez · Tek dosya
+Kurulum gerekmez · .NET gerekmez · Tek dosya · [Tüm sürümler](https://github.com/gunhanmehmetakif/sunum-buyuteci/releases)
 
 <br>
 
