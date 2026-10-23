@@ -14,6 +14,8 @@ public sealed class ShortcutsWindow : Window
         ("Ctrl + Alt + ↓   /   −   /   Tekerlek aşağı", "Uzaklaştır"),
         ("Ctrl + Alt + 0", "Tam ekran (1x)"),
         ("Ctrl + Alt + K", "Çerçeveyi kilitle / çöz"),
+        ("Ctrl + Alt + L", "Sıradaki işaretçi görünümü"),
+        ("Ctrl + Alt + G", "İşaretçiyi gizle / geri getir"),
         ("Ctrl + Alt + Q", "Çıkış"),
     };
 

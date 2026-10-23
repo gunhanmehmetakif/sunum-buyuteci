@@ -22,6 +22,7 @@ public sealed class MagnifierOutput : IDisposable
     private bool _classRegistered;
     private RECT _source;
     private double _zoom = 1.0;
+    private bool _showCursor = true;
 
     /// <param name="hostBounds">Screen rectangle the output window covers (target monitor, or the test window).</param>
     /// <param name="fullSource">Full source area (primary monitor bounds) shown at 1x.</param>
@@ -73,7 +74,7 @@ public sealed class MagnifierOutput : IDisposable
         NativeMethods.SetLayeredWindowAttributes(_host, 0, 255, NativeMethods.LWA_ALPHA);
 
         _magnifier = NativeMethods.CreateWindowEx(0, Magnification.WC_MAGNIFIER, "Magnifier",
-            NativeMethods.WS_CHILD | NativeMethods.WS_VISIBLE | Magnification.MS_SHOWMAGNIFIEDCURSOR,
+            NativeMethods.WS_CHILD | NativeMethods.WS_VISIBLE | (_showCursor ? Magnification.MS_SHOWMAGNIFIEDCURSOR : 0),
             0, 0, _hostBounds.Width, _hostBounds.Height, _host, IntPtr.Zero, _hInstance, IntPtr.Zero);
         if (_magnifier == IntPtr.Zero) throw new Win32Exception(Marshal.GetLastWin32Error());
 
@@ -109,6 +110,29 @@ public sealed class MagnifierOutput : IDisposable
         SetSourceRect(new RECT(left, top, left + w, top + h));
     }
 
+    /// <summary>Shows or hides the Windows cursor inside the mirror (the presenter's own cursor is unaffected).</summary>
+    public void SetShowCursor(bool show)
+    {
+        _showCursor = show;
+        if (_magnifier == IntPtr.Zero) return;
+        long style = NativeMethods.GetWindowLongPtr(_magnifier, NativeMethods.GWL_STYLE).ToInt64();
+        style = show ? style | Magnification.MS_SHOWMAGNIFIEDCURSOR : style & ~(long)Magnification.MS_SHOWMAGNIFIEDCURSOR;
+        NativeMethods.SetWindowLongPtr(_magnifier, NativeMethods.GWL_STYLE, new IntPtr(style));
+        NativeMethods.InvalidateRect(_magnifier, IntPtr.Zero, true);
+    }
+
+    /// <summary>Maps a primary-screen point to host-screen coordinates; false if it is outside the mirrored rectangle.</summary>
+    public bool TryMapToHost(POINT screenPt, out POINT hostPt)
+    {
+        hostPt = default;
+        if (screenPt.X < _source.Left || screenPt.X >= _source.Right || screenPt.Y < _source.Top || screenPt.Y >= _source.Bottom)
+            return false;
+        GetLayout(out int cw, out int ch, out int ox, out int oy);
+        hostPt.X = _hostBounds.Left + ox + (int)Math.Round((screenPt.X - _source.Left) * (double)cw / _source.Width);
+        hostPt.Y = _hostBounds.Top + oy + (int)Math.Round((screenPt.Y - _source.Top) * (double)ch / _source.Height);
+        return true;
+    }
+
     /// <summary>Windows that must not appear in the mirror (frame overlay, number overlays, ...).</summary>
     public void SetExcludedWindows(IEnumerable<IntPtr> windows)
     {
@@ -127,13 +151,20 @@ public sealed class MagnifierOutput : IDisposable
     /// <summary>Fits the source aspect inside the host (black bars) and sets scale = childWidth / sourceWidth.</summary>
     private void ApplyLayout()
     {
-        int hw = _hostBounds.Width, hh = _hostBounds.Height;
-        double fit = Math.Min((double)hw / _source.Width, (double)hh / _source.Height);
-        int cw = Math.Max(1, (int)Math.Round(_source.Width * fit));
-        int ch = Math.Max(1, (int)Math.Round(_source.Height * fit));
-        NativeMethods.MoveWindow(_magnifier, (hw - cw) / 2, (hh - ch) / 2, cw, ch, true);
+        GetLayout(out int cw, out int ch, out int ox, out int oy);
+        NativeMethods.MoveWindow(_magnifier, ox, oy, cw, ch, true);
         var t = MAGTRANSFORM.Scale((float)cw / _source.Width);
         Magnification.MagSetWindowTransform(_magnifier, ref t);
+    }
+
+    private void GetLayout(out int cw, out int ch, out int ox, out int oy)
+    {
+        int hw = _hostBounds.Width, hh = _hostBounds.Height;
+        double fit = Math.Min((double)hw / _source.Width, (double)hh / _source.Height);
+        cw = Math.Max(1, (int)Math.Round(_source.Width * fit));
+        ch = Math.Max(1, (int)Math.Round(_source.Height * fit));
+        ox = (hw - cw) / 2;
+        oy = (hh - ch) / 2;
     }
 
     private void Refresh()

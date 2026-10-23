@@ -27,6 +27,26 @@ public struct MONITORINFOEX
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string szDevice;
 }
 
+[StructLayout(LayoutKind.Sequential)]
+public struct SIZE
+{
+    public int cx, cy;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct BLENDFUNCTION
+{
+    public byte BlendOp, BlendFlags, SourceConstantAlpha, AlphaFormat;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct BITMAPINFOHEADER
+{
+    public int biSize, biWidth, biHeight;
+    public short biPlanes, biBitCount;
+    public int biCompression, biSizeImage, biXPelsPerMeter, biYPelsPerMeter, biClrUsed, biClrImportant;
+}
+
 public delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdc, ref RECT rect, IntPtr data);
 public delegate IntPtr HookProc(int code, IntPtr wParam, IntPtr lParam);
 public delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
@@ -54,7 +74,10 @@ public static class NativeMethods
     public const uint WS_EX_TOPMOST = 0x8, WS_EX_TRANSPARENT = 0x20, WS_EX_TOOLWINDOW = 0x80,
         WS_EX_LAYERED = 0x80000, WS_EX_NOACTIVATE = 0x08000000;
     public const uint LWA_ALPHA = 0x2;
-    public const int GWL_EXSTYLE = -20;
+    public const int GWL_EXSTYLE = -20, GWL_STYLE = -16;
+    public const int SW_HIDE = 0;
+    public const uint ULW_ALPHA = 0x2;
+    public const uint WM_NCHITTEST = 0x84;
     public const int SW_SHOWNOACTIVATE = 4;
     public const int BLACK_BRUSH = 4;
     public const uint SWP_NOMOVE = 0x2, SWP_NOSIZE = 0x1, SWP_NOACTIVATE = 0x10, SWP_SHOWWINDOW = 0x40;
@@ -127,6 +150,32 @@ public static class NativeMethods
 
     [DllImport("user32.dll")]
     public static extern bool GetWindowRect(IntPtr hWnd, out RECT rect);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool UpdateLayeredWindow(IntPtr hWnd, IntPtr hdcDst, ref POINT pptDst, ref SIZE size,
+        IntPtr hdcSrc, ref POINT pptSrc, uint crKey, ref BLENDFUNCTION blend, uint flags);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetDC(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern int ReleaseDC(IntPtr hWnd, IntPtr hdc);
+
+    [DllImport("gdi32.dll")]
+    public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
+
+    [DllImport("gdi32.dll")]
+    public static extern IntPtr CreateDIBSection(IntPtr hdc, ref BITMAPINFOHEADER bmi, uint usage, out IntPtr bits,
+        IntPtr section, uint offset);
+
+    [DllImport("gdi32.dll")]
+    public static extern IntPtr SelectObject(IntPtr hdc, IntPtr obj);
+
+    [DllImport("gdi32.dll")]
+    public static extern bool DeleteObject(IntPtr obj);
+
+    [DllImport("gdi32.dll")]
+    public static extern bool DeleteDC(IntPtr hdc);
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
     public static extern IntPtr GetModuleHandle(string? moduleName);

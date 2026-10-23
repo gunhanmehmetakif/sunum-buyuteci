@@ -11,6 +11,26 @@ public enum FollowMode
     Center,
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum PointerStyle
+{
+    Normal,
+    Hand,
+    BigArrow,
+    Laser,
+    Ring,
+    Crosshair,
+    Hidden,
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum PointerSize
+{
+    Small,
+    Medium,
+    Large,
+}
+
 public sealed class Settings
 {
     private static readonly string FilePath = Path.Combine(
@@ -21,6 +41,11 @@ public sealed class Settings
     public FollowMode FollowMode { get; set; } = FollowMode.Edge;
 
     public bool ClipCursor { get; set; } = true;
+
+    /// <summary>How the pointer looks on the presentation screen (the presenter's own cursor is never changed).</summary>
+    public PointerStyle PointerStyle { get; set; } = PointerStyle.Normal;
+
+    public PointerSize PointerSize { get; set; } = PointerSize.Medium;
 
     /// <summary>Last zoom above 1x; used by the tray double-click toggle.</summary>
     public double LastZoom { get; set; } = 2.0;

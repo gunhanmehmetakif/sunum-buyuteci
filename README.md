@@ -35,6 +35,7 @@ Bir derste hoca sunum yaparken Windows Büyüteci'ni kullanıyordu. Büyüteç k
 - **Görünmez çerçeve:** Neresinin büyütüldüğünü yalnız siz görürsünüz.
 - **Kontrol penceresi:** Tek tıkla büyüt, küçült, kilitle, tam ekrana dön. İzleyiciler bu pencereyi de görmez.
 - **Kısayollar:** Klavyeden ve fare tekerleğinden yakınlaştırma. AltGr ile yazılan `@` gibi karakterleri bozmaz.
+- **İşaretçi görünümü:** İzleyiciler imleç yerine el, lazer, halka gibi bir işaretçi görür ya da hiç görmez. Sizin imleciniz değişmez.
 - **Çerçeve kilidi:** Büyütülen alanı sabitleyip fareyi serbestçe kullanın.
 - **Kablo dostu:** Projeksiyon kablosu çıkıp takılınca kaldığı yerden devam eder.
 
@@ -52,6 +53,8 @@ Bir derste hoca sunum yaparken Windows Büyüteci'ni kullanıyordu. Büyüteç k
 | `Ctrl + Alt + ↑ / ↓` (veya numpad `+ / -`) | Yakınlaştır / uzaklaştır |
 | `Ctrl + Alt + 0` | Tam ekran (1x) |
 | `Ctrl + Alt + K` | Çerçeveyi kilitle / çöz |
+| `Ctrl + Alt + L` | İşaretçi görünümünü değiştir (El, Lazer, …) |
+| `Ctrl + Alt + G` | İşaretçiyi gizle / geri getir |
 | `Ctrl + Alt + Q` | Çıkış |
 
 PowerPoint ile kullanım ve ayrıntılar: **[Kullanım kılavuzu](docs/KULLANIM.md)**

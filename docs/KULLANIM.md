@@ -21,6 +21,8 @@
 | Ctrl + Alt + ↑ / ↓ (veya numpad + / -) | Yakınlaştır / uzaklaştır |
 | Ctrl + Alt + 0 | Tam ekran (1x) |
 | Ctrl + Alt + K | Çerçeveyi kilitle / çöz (kilitliyken turuncu) |
+| Ctrl + Alt + L | İşaretçi görünümünü değiştir (El, Lazer, …) |
+| Ctrl + Alt + G | İşaretçiyi gizle / geri getir |
 | Ctrl + Alt + Q | Çıkış |
 
 Simgeye çift tık: 1x ↔ son yakınlaştırma. Sağ tık menüsünde takip modu, fare kilidi, ekranı değiştir ve kısayollar var.

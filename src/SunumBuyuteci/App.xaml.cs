@@ -27,6 +27,8 @@ public partial class App : Application
     private bool _magInitialized;
     private bool _testWindow;
     private FrameWindow? _frame;
+    private PointerWindow? _pointer;
+    private PointerStyle? _previousPointer; // style to return to when the pointer is un-hidden
     private BadgeWindow? _badge;
     private CursorClip? _clip;
     private TrayIcon? _tray;
@@ -87,6 +89,8 @@ public partial class App : Application
         _input.ZoomOut += () => _view?.ZoomOut();
         _input.ResetZoom += () => _view?.ResetZoom();
         _input.ToggleLock += () => _view?.ToggleLock();
+        _input.NextPointer += NextPointer;
+        _input.TogglePointerHidden += TogglePointerHidden;
 
         CreateTray();
         if (!_input.IsActive) _tray!.ShowBalloon("Kısayollar etkinleştirilemedi", warning: true);
@@ -114,6 +118,8 @@ public partial class App : Application
         _tray.ToggleZoomRequested += ToggleZoom;
         _tray.FollowModeChanged += SetFollowMode;
         _tray.ClipCursorChanged += SetClipCursor;
+        _tray.PointerStyleChanged += SetPointerStyle;
+        _tray.PointerSizeChanged += SetPointerSize;
         _tray.ChangeScreenRequested += ChangeScreen;
         _tray.ShortcutsRequested += ShowShortcuts;
         _tray.ExitRequested += () => Shutdown();
@@ -136,6 +142,40 @@ public partial class App : Application
         UpdateTray();
     }
 
+    private void SetPointerStyle(PointerStyle style)
+    {
+        var old = _settings.PointerStyle;
+        if (style != old && style == PointerStyle.Hidden) _previousPointer = old;
+        _settings.PointerStyle = style;
+        _settings.Save();
+        _output?.SetShowCursor(style == PointerStyle.Normal);
+        _pointer?.SetStyle(style);
+        UpdateTray();
+        _badge?.ShowText(PointerInfo.Name(style));
+    }
+
+    private void SetPointerSize(PointerSize size)
+    {
+        _settings.PointerSize = size;
+        _settings.Save();
+        _pointer?.SetSize(size);
+        UpdateTray();
+    }
+
+    private void NextPointer()
+    {
+        var styles = PointerInfo.Styles;
+        int i = Array.IndexOf(styles, _settings.PointerStyle);
+        SetPointerStyle(styles[(i + 1) % styles.Length]);
+    }
+
+    private void TogglePointerHidden()
+    {
+        if (_settings.PointerStyle != PointerStyle.Hidden) { SetPointerStyle(PointerStyle.Hidden); return; }
+        var back = _previousPointer ?? PointerStyle.Normal;
+        SetPointerStyle(back == PointerStyle.Hidden ? PointerStyle.Normal : back);
+    }
+
     private void SetControlTopmost(bool enabled)
     {
         _settings.ControlTopmost = enabled;
@@ -146,10 +186,11 @@ public partial class App : Application
     /// <summary>Pushes the current state to the tray icon and the control window.</summary>
     private void UpdateTray()
     {
-        _tray?.SetState(_view?.IsLocked ?? false, _settings.FollowMode, _settings.ClipCursor);
+        _tray?.SetState(_view?.IsLocked ?? false, _settings.FollowMode, _settings.ClipCursor,
+            _settings.PointerStyle, _settings.PointerSize);
         _tray?.SetZoom(_view?.TargetZoom ?? 1.0);
         _control?.SetState(_view?.TargetZoom ?? 1.0, _view?.IsLocked ?? false, _settings.FollowMode,
-            _settings.ClipCursor, _waitingForTarget);
+            _settings.ClipCursor, _waitingForTarget, _settings.PointerStyle, _settings.PointerSize);
     }
 
     private void ShowControl()
@@ -163,6 +204,8 @@ public partial class App : Application
             _control.FullScreenRequested += ToggleZoom;
             _control.FollowModeChanged += SetFollowMode;
             _control.ClipCursorChanged += SetClipCursor;
+            _control.PointerStyleChanged += SetPointerStyle;
+            _control.PointerSizeChanged += SetPointerSize;
             _control.TopmostChanged += SetControlTopmost;
             _control.ChangeScreenRequested += ChangeScreen;
             _control.ShortcutsRequested += ShowShortcuts;
@@ -180,6 +223,7 @@ public partial class App : Application
         var list = _selectionOverlays.Where(NativeMethods.IsWindow).ToList();
         if (_frame != null) list.Add(_frame.Handle);
         if (_badge != null) list.Add(_badge.Handle);
+        if (_pointer != null) list.Add(_pointer.Handle);
         if (_control != null) list.AddRange(_control.ExcludedHandles);
         _output.SetExcludedWindows(list);
     }
@@ -278,12 +322,17 @@ public partial class App : Application
             _hostBounds = hostBounds;
             _sourceBounds = source;
             _output = new MagnifierOutput(hostBounds, source);
+            _output.SetShowCursor(_settings.PointerStyle == PointerStyle.Normal);
             _view = new ViewController(_output, _settings.FollowMode, _resumeZoom, _resumeCenter);
             _view.Changed += OnViewChanged;
             _view.SuspendFollow = () => _control?.SuspendsFollow ?? false;
             _output.Start();
             _frame = new FrameWindow(_view, _output);
             _frame.Start();
+            _pointer = new PointerWindow(_output, () => _control?.SuspendsFollow ?? false,
+                _settings.PointerStyle, _settings.PointerSize);
+            _pointer.Shown += ApplyExclusions;
+            _pointer.Start();
             _badge = new BadgeWindow(_view, source);
             _badge.Show();
 
@@ -347,6 +396,8 @@ public partial class App : Application
         _clip = null;
         _frame?.Dispose();
         _frame = null;
+        _pointer?.Dispose();
+        _pointer = null;
         _badge?.Close();
         _badge = null;
         _output?.Dispose();

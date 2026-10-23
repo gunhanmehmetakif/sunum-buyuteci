@@ -13,12 +13,16 @@ public sealed class TrayIcon : IDisposable
 
     private readonly NotifyIcon _icon;
     private readonly ToolStripMenuItem _lock, _edge, _center, _clip;
+    private readonly Dictionary<PointerStyle, ToolStripMenuItem> _pointerStyles = new();
+    private readonly Dictionary<PointerSize, ToolStripMenuItem> _pointerSizes = new();
     private Icon? _iconImage;
 
     public event Action? ZoomInRequested, ZoomOutRequested, ResetRequested, ToggleLockRequested,
         ToggleZoomRequested, ChangeScreenRequested, ShortcutsRequested, ExitRequested;
     public event Action<FollowMode>? FollowModeChanged;
     public event Action<bool>? ClipCursorChanged;
+    public event Action<PointerStyle>? PointerStyleChanged;
+    public event Action<PointerSize>? PointerSizeChanged;
 
     public TrayIcon()
     {
@@ -30,6 +34,21 @@ public sealed class TrayIcon : IDisposable
         var follow = new ToolStripMenuItem("Takip modu");
         follow.DropDownItems.AddRange(new ToolStripItem[] { _edge, _center });
 
+        var pointer = new ToolStripMenuItem("İşaretçi");
+        foreach (var style in Overlay.PointerInfo.Styles)
+        {
+            var s = style;
+            pointer.DropDownItems.Add(_pointerStyles[s] = Item(Overlay.PointerInfo.Name(s), () => PointerStyleChanged?.Invoke(s)));
+        }
+        pointer.DropDownItems.Add(new ToolStripSeparator());
+        var pointerSize = new ToolStripMenuItem("Boyut");
+        foreach (var size in Overlay.PointerInfo.Sizes)
+        {
+            var z = size;
+            pointerSize.DropDownItems.Add(_pointerSizes[z] = Item(Overlay.PointerInfo.Name(z), () => PointerSizeChanged?.Invoke(z)));
+        }
+        pointer.DropDownItems.Add(pointerSize);
+
         var menu = new ContextMenuStrip();
         menu.Items.Add(Item("Yakınlaştır  (Ctrl+Alt+↑)", () => ZoomInRequested?.Invoke()));
         menu.Items.Add(Item("Uzaklaştır  (Ctrl+Alt+↓)", () => ZoomOutRequested?.Invoke()));
@@ -38,6 +57,7 @@ public sealed class TrayIcon : IDisposable
         menu.Items.Add(_lock);
         menu.Items.Add(follow);
         menu.Items.Add(_clip);
+        menu.Items.Add(pointer);
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(Item("Ekranı değiştir…", () => ChangeScreenRequested?.Invoke()));
         menu.Items.Add(Item("Kısayollar", () => ShortcutsRequested?.Invoke()));
@@ -60,8 +80,10 @@ public sealed class TrayIcon : IDisposable
     public void SetZoom(double zoom) =>
         _icon.Text = "Sunum Büyüteci – " + zoom.ToString("0.##", Tr) + "x";
 
-    public void SetState(bool locked, FollowMode mode, bool clipCursor)
+    public void SetState(bool locked, FollowMode mode, bool clipCursor, PointerStyle pointerStyle, PointerSize pointerSize)
     {
+        foreach (var (style, item) in _pointerStyles) item.Checked = style == pointerStyle;
+        foreach (var (size, item) in _pointerSizes) item.Checked = size == pointerSize;
         _lock.Checked = locked;
         _edge.Checked = mode == FollowMode.Edge;
         _center.Checked = mode == FollowMode.Center;

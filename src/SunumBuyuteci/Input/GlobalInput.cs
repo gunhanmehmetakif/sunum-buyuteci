@@ -14,7 +14,8 @@ public sealed class GlobalInput : IDisposable
     private const int WM_KEYDOWN = 0x100, WM_KEYUP = 0x101, WM_SYSKEYDOWN = 0x104, WM_SYSKEYUP = 0x105, WM_MOUSEWHEEL = 0x20A;
     private const int VK_CONTROL = 0x11, VK_LMENU = 0xA4, VK_RMENU = 0xA5;
     private const int VK_NUMPAD0 = 0x60, VK_ADD = 0x6B, VK_SUBTRACT = 0x6D,
-        VK_OEM_PLUS = 0xBB, VK_OEM_MINUS = 0xBD, VK_UP = 0x26, VK_DOWN = 0x28, VK_0 = 0x30, VK_K = 0x4B, VK_Q = 0x51;
+        VK_OEM_PLUS = 0xBB, VK_OEM_MINUS = 0xBD, VK_UP = 0x26, VK_DOWN = 0x28, VK_0 = 0x30, VK_K = 0x4B, VK_Q = 0x51,
+        VK_L = 0x4C, VK_G = 0x47;
 
     private readonly Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
     private readonly HookProc _keyboardProc;
@@ -22,7 +23,7 @@ public sealed class GlobalInput : IDisposable
     private readonly HashSet<int> _swallowedKeys = new();
     private IntPtr _keyboardHook, _mouseHook;
 
-    public event Action? ZoomIn, ZoomOut, ResetZoom, ToggleLock, ExitRequested;
+    public event Action? ZoomIn, ZoomOut, ResetZoom, ToggleLock, NextPointer, TogglePointerHidden, ExitRequested;
 
     public GlobalInput()
     {
@@ -89,6 +90,8 @@ public sealed class GlobalInput : IDisposable
         VK_SUBTRACT or VK_OEM_MINUS or VK_DOWN => () => ZoomOut?.Invoke(),
         VK_0 or VK_NUMPAD0 => () => ResetZoom?.Invoke(),
         VK_K => () => ToggleLock?.Invoke(),
+        VK_L => () => NextPointer?.Invoke(),
+        VK_G => () => TogglePointerHidden?.Invoke(),
         VK_Q => () => ExitRequested?.Invoke(),
         _ => null,
     };

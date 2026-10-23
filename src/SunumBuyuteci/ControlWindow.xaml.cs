@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using SunumBuyuteci.Display;
 using SunumBuyuteci.Magnifier;
 using SunumBuyuteci.Native;
+using SunumBuyuteci.Overlay;
 
 namespace SunumBuyuteci;
 
@@ -19,14 +20,21 @@ public partial class ControlWindow : Window
     private readonly Settings _settings;
     private readonly DispatcherTimer _saveDebounce;
     private readonly MenuItem _edge, _center, _clip, _topmost, _follow;
-    private readonly ContextMenu _menu;
+    private readonly ContextMenu _menu, _pointerMenu;
+    private readonly MenuItem _pointerSize;
+    private readonly Dictionary<PointerStyle, MenuItem> _pointerStyles = new();
+    private readonly Dictionary<PointerSize, MenuItem> _pointerSizes = new();
     private readonly HashSet<IntPtr> _popupHandles = new();
-    private bool _locked, _menuOpen, _positioned, _closing;
+    private readonly Dictionary<ContextMenu, MenuItem[]> _trackedMenus = new();
+    private readonly HashSet<ContextMenu> _openMenus = new();
+    private bool _locked, _positioned, _closing;
 
     public event Action? ZoomInRequested, ZoomOutRequested, ToggleLockRequested, FullScreenRequested,
         ChangeScreenRequested, ShortcutsRequested, ExitRequested, ExcludedChanged;
     public event Action<FollowMode>? FollowModeChanged;
     public event Action<bool>? ClipCursorChanged, TopmostChanged;
+    public event Action<PointerStyle>? PointerStyleChanged;
+    public event Action<PointerSize>? PointerSizeChanged;
 
     public ControlWindow(Settings settings)
     {
@@ -41,7 +49,6 @@ public partial class ControlWindow : Window
         _follow = new MenuItem { Header = "Takip modu" };
         _follow.Items.Add(_edge);
         _follow.Items.Add(_center);
-        _follow.SubmenuOpened += (_, _) => Dispatcher.BeginInvoke(RefreshPopupHandles, DispatcherPriority.Loaded);
 
         _menu = new ContextMenu { Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
         _menu.Items.Add(_follow);
@@ -52,17 +59,28 @@ public partial class ControlWindow : Window
         _menu.Items.Add(Item("Kısayollar", () => ShortcutsRequested?.Invoke()));
         _menu.Items.Add(new Separator());
         _menu.Items.Add(Item("Çıkış", () => ExitRequested?.Invoke()));
-        _menu.Opened += (_, _) =>
+        TrackMenu(_menu, _follow);
+
+        _pointerMenu = new ContextMenu { Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
+        foreach (var style in PointerInfo.Styles)
         {
-            _menuOpen = true;
-            Dispatcher.BeginInvoke(RefreshPopupHandles, DispatcherPriority.Loaded);
-        };
-        _menu.Closed += (_, _) =>
+            var s = style;
+            var item = Item(PointerInfo.Name(s), () => PointerStyleChanged?.Invoke(s));
+            item.Icon = PreviewImage(s);
+            _pointerStyles[s] = item;
+            _pointerMenu.Items.Add(item);
+        }
+        _pointerMenu.Items.Add(new Separator());
+        _pointerSize = new MenuItem { Header = "Boyut" };
+        foreach (var size in PointerInfo.Sizes)
         {
-            _menuOpen = false;
-            _popupHandles.Clear();
-            ExcludedChanged?.Invoke();
-        };
+            var z = size;
+            var item = Item(PointerInfo.Name(z), () => PointerSizeChanged?.Invoke(z));
+            _pointerSizes[z] = item;
+            _pointerSize.Items.Add(item);
+        }
+        _pointerMenu.Items.Add(_pointerSize);
+        TrackMenu(_pointerMenu, _pointerSize);
 
         _saveDebounce = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
         _saveDebounce.Tick += (_, _) => { _saveDebounce.Stop(); SavePosition(); };
@@ -79,7 +97,34 @@ public partial class ControlWindow : Window
             SavePosition();
             if (!_closing) ExitRequested?.Invoke();
         };
-        SetState(1.0, false, FollowMode.Edge, true, false);
+        SetState(1.0, false, FollowMode.Edge, true, false, settings.PointerStyle, settings.PointerSize);
+    }
+
+    private static Image PreviewImage(PointerStyle style) => new()
+    {
+        Source = PointerWindow.RenderPreview(style),
+        Width = 20,
+        Height = 20,
+        SnapsToDevicePixels = true,
+    };
+
+    /// <summary>Registers a context menu (and its submenus) whose popup windows must be excluded from the mirror.</summary>
+    private void TrackMenu(ContextMenu menu, params MenuItem[] submenus)
+    {
+        _trackedMenus[menu] = submenus;
+        foreach (var sub in submenus)
+            sub.SubmenuOpened += (_, _) => Dispatcher.BeginInvoke(RefreshPopupHandles, DispatcherPriority.Loaded);
+        menu.Opened += (_, _) =>
+        {
+            _openMenus.Add(menu);
+            Dispatcher.BeginInvoke(RefreshPopupHandles, DispatcherPriority.Loaded);
+        };
+        menu.Closed += (_, _) =>
+        {
+            _openMenus.Remove(menu);
+            _popupHandles.Clear();
+            ExcludedChanged?.Invoke();
+        };
     }
 
     private static MenuItem Item(string text, Action onClick)
@@ -109,7 +154,7 @@ public partial class ControlWindow : Window
         get
         {
             if (!IsVisible) return false;
-            if (_menuOpen) return true;
+            if (_openMenus.Count > 0) return true;
             if (WindowState == WindowState.Minimized) return false;
             var h = Handle;
             return h != IntPtr.Zero && NativeMethods.GetCursorPos(out var p) && NativeMethods.GetWindowRect(h, out var r) &&
@@ -117,8 +162,12 @@ public partial class ControlWindow : Window
         }
     }
 
-    public void SetState(double zoom, bool locked, FollowMode mode, bool clipCursor, bool waiting)
+    public void SetState(double zoom, bool locked, FollowMode mode, bool clipCursor, bool waiting,
+        PointerStyle pointerStyle, PointerSize pointerSize)
     {
+        foreach (var (style, item) in _pointerStyles) item.IsChecked = style == pointerStyle;
+        foreach (var (size, item) in _pointerSizes) item.IsChecked = size == pointerSize;
+        PointerIcon.Source = PointerWindow.RenderPreview(pointerStyle);
         _locked = locked;
         ZoomLabel.Text = waiting ? "Bekleniyor…" : Math.Round(zoom * 100).ToString("0", Tr) + "%";
         ZoomLabel.FontSize = waiting ? 14 : 18;
@@ -137,8 +186,13 @@ public partial class ControlWindow : Window
     private void RefreshPopupHandles()
     {
         _popupHandles.Clear();
-        AddPopupHandle(_menu);
-        foreach (var item in _follow.Items) AddPopupHandle(item as FrameworkElement);
+        foreach (var (menu, submenus) in _trackedMenus)
+        {
+            if (!_openMenus.Contains(menu)) continue;
+            AddPopupHandle(menu);
+            foreach (var sub in submenus)
+                foreach (var item in sub.Items) AddPopupHandle(item as FrameworkElement);
+        }
         ExcludedChanged?.Invoke();
     }
 
@@ -208,6 +262,12 @@ public partial class ControlWindow : Window
     {
         ToggleLockRequested?.Invoke();
         LockButton.IsChecked = _locked;
+    }
+
+    private void Pointer_Click(object sender, RoutedEventArgs e)
+    {
+        _pointerMenu.PlacementTarget = PointerButton;
+        _pointerMenu.IsOpen = true;
     }
 
     private void Settings_Click(object sender, RoutedEventArgs e)

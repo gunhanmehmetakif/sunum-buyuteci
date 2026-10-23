@@ -13,7 +13,7 @@ namespace SunumBuyuteci.Overlay;
 /// <summary>Small rounded label at the bottom center of the primary screen, shown briefly after a zoom or lock change.</summary>
 public sealed class BadgeWindow : Window
 {
-    private const int WidthDip = 160, HeightDip = 56, BottomMarginDip = 96; // clear of the taskbar and the control window
+    private const int MinWidthDip = 160, HeightDip = 56, BottomMarginDip = 96, TextPaddingDip = 48; // clear of the taskbar and the control window
     private static readonly CultureInfo Tr = new("tr-TR");
 
     private readonly RECT _screen;
@@ -21,6 +21,7 @@ public sealed class BadgeWindow : Window
     private readonly TextBlock _text;
     private readonly DispatcherTimer _hideTimer;
     private IntPtr _hwnd;
+    private double _widthDip = MinWidthDip;
 
     public IntPtr Handle => _hwnd;
 
@@ -36,7 +37,7 @@ public sealed class BadgeWindow : Window
         ShowInTaskbar = false;
         ShowActivated = false;
         Topmost = true;
-        Width = WidthDip;
+        Width = MinWidthDip;
         Height = HeightDip;
         Opacity = 0;
 
@@ -74,9 +75,18 @@ public sealed class BadgeWindow : Window
 
     private void OnChanged(ViewChangeReason reason)
     {
-        _text.Text = reason == ViewChangeReason.Lock
+        ShowText(reason == ViewChangeReason.Lock
             ? (_view.IsLocked ? "Kilitli" : "Takip")
-            : FormatZoom(_view.TargetZoom);
+            : FormatZoom(_view.TargetZoom));
+    }
+
+    /// <summary>Shows the badge with the given text and fades it out after a moment.</summary>
+    public void ShowText(string text)
+    {
+        _text.Text = text;
+        _text.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        _widthDip = Math.Max(MinWidthDip, Math.Ceiling(_text.DesiredSize.Width) + TextPaddingDip);
+        Width = _widthDip;
         BeginAnimation(OpacityProperty, null);
         Opacity = 1;
         Place();
@@ -90,7 +100,7 @@ public sealed class BadgeWindow : Window
     {
         if (_hwnd == IntPtr.Zero) return;
         double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
-        int w = (int)Math.Round(WidthDip * scale), h = (int)Math.Round(HeightDip * scale);
+        int w = (int)Math.Round(_widthDip * scale), h = (int)Math.Round(HeightDip * scale);
         int x = _screen.Left + (_screen.Width - w) / 2;
         int y = _screen.Bottom - h - (int)Math.Round(BottomMarginDip * scale);
         NativeMethods.SetWindowPos(_hwnd, NativeMethods.HWND_TOPMOST, x, y, w, h, NativeMethods.SWP_NOACTIVATE);

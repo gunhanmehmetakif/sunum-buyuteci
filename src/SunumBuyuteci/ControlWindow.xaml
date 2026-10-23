@@ -130,6 +130,16 @@
             </StackPanel>
         </Button>
 
+        <Button x:Name="PointerButton" Style="{StaticResource ToolButton}" Click="Pointer_Click" Margin="8,0,0,0"
+                ToolTip="İşaretçi görünümü (Ctrl+Alt+L, gizle: Ctrl+Alt+G)">
+            <StackPanel Orientation="Horizontal">
+                <Image x:Name="PointerIcon" Width="20" Height="20" VerticalAlignment="Center"
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                <TextBlock Text="İşaretçi" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                <TextBlock Style="{StaticResource IconText}" Text="&#xE70D;" FontSize="10" Margin="8,0,0,0"/>
+            </StackPanel>
+        </Button>
+
         <Border Width="1" Height="28" Background="#D9DEE7" Margin="12,0"/>
 
         <Button x:Name="SettingsButton" Style="{StaticResource ToolButton}" Click="Settings_Click" ToolTip="Ayarlar">
